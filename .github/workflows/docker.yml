@@ -1,0 +1,32 @@
+name: Build Lambda Layer (Python 3.12)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create folder
+        run: mkdir -p python
+
+      - name: Install dependencies in Docker
+        run: |
+          docker run --rm \
+          -v ${{ github.workspace }}:/var/task \
+          python:3.12-slim \
+          bash -c "pip install qrcode[pil] -t python"
+
+      - name: Zip layer
+        run: zip -r qrcode-layer.zip python
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrcode-layer-python312
+          path: qrcode-layer.zip
