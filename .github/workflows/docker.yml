@@ -12,17 +12,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create folder
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create layer folder
         run: mkdir -p python
 
-      - name: Install dependencies in Docker
+      - name: Install dependencies
         run: |
-          docker run --rm \
-          -v ${{ github.workspace }}:/var/task \
-          python:3.12-slim \
-          bash -c "pip install qrcode[pil] -t python"
+          python -m pip install --upgrade pip
+          python -m pip install qrcode[pil] -t python
 
-      - name: Zip layer
+      - name: Debug folder contents
+        run: ls -R python
+
+      - name: Create zip
         run: zip -r qrcode-layer.zip python
 
       - name: Upload artifact
